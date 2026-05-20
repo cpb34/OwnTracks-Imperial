@@ -6,10 +6,10 @@ This repository contains patches for OwnTracks's Docker Compose setup. Imperial 
 
 For additional documentation, please visit the OwnTracks GitHub
 
-Recorder: https://github.com/owntracks/recorder
-Frontend: https://github.com/owntracks/frontend
-Android: https://github.com/owntracks/android
-iOS: https://github.com/owntracks/ios
+- Recorder: https://github.com/owntracks/recorder
+- Frontend: https://github.com/owntracks/frontend
+- Android: https://github.com/owntracks/android
+- iOS: https://github.com/owntracks/ios
 
 ## Installation Guide
 ### Fresh Install
