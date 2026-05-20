@@ -1,0 +1,56 @@
+services:
+  recorder:
+    image: owntracks/recorder:latest
+    container_name: owntracks-recorder
+    restart: unless-stopped
+    ports:
+      - "${RECORDER_PORT}:8083"
+    environment:
+      - OTR_PORT=0
+    volumes:
+      - ./recorder/store:/store
+    networks:
+      - default
+
+  frontend:
+    image: owntracks/frontend:latest
+    container_name: owntracks-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT}:80"
+    environment:
+      - SERVER_HOST=owntracks-recorder
+      - SERVER_PORT=${RECORDER_PORT}
+    volumes:
+      - ./patches/config.js:/usr/share/nginx/html/config/config.js:ro
+      - ./patches/index-BYtbbaCT.js:/usr/share/nginx/html/assets/index-BYtbbaCT.js:ro
+      - ./patches/index-DcjOgdvw.css:/usr/share/nginx/html/assets/index-DcjOgdvw.css:ro
+      - ./patches/nginx.tmpl:/etc/nginx/nginx.tmpl:ro
+    networks:
+      - default
+    depends_on:
+      recorder:
+        condition: service_started
+      units-api:
+        condition: service_healthy
+
+  units-api:
+    image: python:3-alpine
+    container_name: owntracks-units-api
+    restart: unless-stopped
+    volumes:
+      - ./patches/distance-units.json:/distance-units.json
+      - ./patches/server.py:/server.py
+    networks:
+      - default
+    command: python3 /server.py
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost/')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+networks:
+  default:
+    driver: bridge
+    name: owntracks-default
